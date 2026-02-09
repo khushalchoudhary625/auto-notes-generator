@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Notes Generator</title>
+  <link rel="stylesheet" href="my.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>📘 Auto Notes Generator</h1>
+
+    <div class="box">
+      <label>Upload Notes (PDF / PPT / TXT):</label>
+      <input type="file" id="fileInput">
+    </div>
+
+    <div class="box">
+      <label>OR Enter Topic Name:</label>
+      <input type="text" id="topicInput" placeholder="e.g. Fourier Transform, DNS, OOPS in C++">
+    </div>
+
+    <button onclick="generateNotes()">Generate Notes</button>
+
+    <div class="output">
+      <h2>📝 Short Notes</h2>
+      <div class="card" id="shortNotes">Output will appear here...</div>
+
+      <h2>📐 Key Formulas</h2>
+      <div class="card" id="keyFormulas">Output will appear here...</div>
+
+      <h2>🎯 Exam-Focused Points</h2>
+      <div class="card" id="examPoints">Output will appear here...</div>
+    </div>
+  </div>
+
+  <script>
+  async function generateNotes() {
+    const topic = document.getElementById("topicInput").value;
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+
+    if (!topic && !file) {
+      alert("Please upload a file or enter a topic!");
+      return;
+    }
+
+    const formData = new FormData();
+    if (topic) formData.append("topic", topic);
+    if (file) formData.append("file", file);
+
+    // Show loading text
+    document.getElementById("shortNotes").innerText = "Generating...";
+    document.getElementById("keyFormulas").innerText = "Generating...";
+    document.getElementById("examPoints").innerText = "Generating...";
+
+    try {
+      const response = await fetch("http://localhost:3000/generate", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      document.getElementById("shortNotes").innerText = data.shortNotes;
+      document.getElementById("keyFormulas").innerText = data.keyFormulas;
+      document.getElementById("examPoints").innerText = data.examPoints;
+
+    } catch (error) {
+      console.error(error);
+      alert("Error connecting to server!");
+    }
+  }
+</script>
+
+
+</body>
+</html>
